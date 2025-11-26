@@ -499,6 +499,14 @@
             line-height: 1.5;
         }
 
+        .question-response {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: var(--border-radius-sm);
+            border-left: 4px solid var(--success);
+        }
+
         /* Footer */
         footer {
             background: var(--dark-card);
@@ -704,6 +712,41 @@
             gap: 8px;
             margin-top: 12px;
         }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .subject-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .grade-selector {
+                padding: 8px 0;
+            }
+            
+            .grade-btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .content-tab {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <!-- Include Firebase and PDF.js -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -725,8 +768,8 @@
                         Firi Gemta School - Admin Panel
                     </div>
                     <div style="display: flex; gap: 15px; align-items: center;">
-                        <span id="currentAdminSubject" style="color: var(--primary); font-weight: 600;">Math</span>
-                        <span id="currentAdminGrade" style="color: var(--dark-text-secondary);">Grade 9</span>
+                        <span id="currentAdminSubject" style="color: white; font-weight: 600;">Math</span>
+                        <span id="currentAdminGrade" style="color: rgba(255,255,255,0.8);">Grade 9</span>
                     </div>
                 </div>
             </div>
@@ -759,7 +802,7 @@
 
                     <div class="firebase-highlight">
                         <h3>Complete Content Management System</h3>
-                        <p>Manage all subjects, create quizzes with up to 30 questions (PDF or manual), and post notes for students.</p>
+                        <p>Manage all subjects, view student questions, and post notes for students.</p>
                     </div>
 
                     <div class="grade-selector">
@@ -850,6 +893,7 @@
 
                     <div class="content-tabs">
                         <button class="content-tab active" data-tab="postNotes">Post Notes</button>
+                        <button class="content-tab" data-tab="studentQuestions">Student Questions</button>
                         <button class="content-tab" data-tab="postQuizzes">Post Quizzes</button>
                         <button class="content-tab" data-tab="manageContent">Manage Content</button>
                     </div>
@@ -868,7 +912,7 @@
                                     <textarea class="form-control" id="noteContentInput" rows="6" placeholder="Enter note content. Use **keyword** to highlight important terms."></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Or Upload File</label>
+                                    <label class="form-label">Or Upload PDF File</label>
                                     <div class="upload-area" id="noteUploadArea">
                                         <div class="upload-icon">
                                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -879,8 +923,8 @@
                                                 <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
                                         </div>
-                                        <p>Click to upload PDF or image</p>
-                                        <input type="file" id="noteFileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                                        <p>Click to upload PDF file</p>
+                                        <input type="file" id="noteFileInput" accept=".pdf" style="display: none;">
                                     </div>
                                     <div class="file-preview" id="noteFilePreview">
                                         <!-- File preview will be shown here -->
@@ -894,6 +938,32 @@
                                     </div>
                                     Post Note to Firebase
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Student Questions Section -->
+                        <div id="studentQuestionsSection" class="content-section">
+                            <div class="card">
+                                <h3 class="card-title">Student Questions</h3>
+                                <div class="form-group">
+                                    <label class="form-label" for="filterSubject">Filter by Subject</label>
+                                    <select class="form-control" id="filterSubject">
+                                        <option value="">All Subjects</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="english">English</option>
+                                        <option value="physics">Physics</option>
+                                        <option value="chemistry">Chemistry</option>
+                                        <option value="biology">Biology</option>
+                                        <option value="geography">Geography</option>
+                                        <option value="history">History</option>
+                                        <option value="economics">Economics</option>
+                                        <option value="it">IT</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="student-questions-list" id="studentQuestionsList">
+                                <!-- Student questions will be populated here -->
                             </div>
                         </div>
 
@@ -1009,39 +1079,12 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Student Questions Page -->
-                <div id="studentQuestionsPage" class="page">
-                    <h2 class="section-title">Student Questions</h2>
-                    
-                    <div class="card">
-                        <div class="form-group">
-                            <label class="form-label" for="filterSubject">Filter by Subject</label>
-                            <select class="form-control" id="filterSubject">
-                                <option value="">All Subjects</option>
-                                <option value="math">Mathematics</option>
-                                <option value="english">English</option>
-                                <option value="physics">Physics</option>
-                                <option value="chemistry">Chemistry</option>
-                                <option value="biology">Biology</option>
-                                <option value="geography">Geography</option>
-                                <option value="history">History</option>
-                                <option value="economics">Economics</option>
-                                <option value="it">IT</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="student-questions-list" id="studentQuestionsList">
-                        <!-- Student questions will be populated here -->
-                    </div>
-                </div>
             </div>
         </main>
 
         <footer>
             <div class="container">
-                <p>&copy; 2023 Firi Gemta School. Complete Admin Panel - Supports 30 Questions & All Subjects</p>
+                <p>&copy; 2023 Firi Gemta School. Complete Admin Panel - View Student Questions & Post Notes</p>
             </div>
         </footer>
     </div>
@@ -1063,7 +1106,7 @@
             authDomain: "my-tiktok-cbd6f.firebaseapp.com",
             databaseURL: "https://my-tiktok-cbd6f-default-rtdb.firebaseio.com",
             projectId: "my-tiktok-cbd6f",
-            storageBucket: "my-tiktok-cbd6f.firebasestorage.app",
+            storageBucket: "my-tiktok-cbd6f.appspot.com",
             messagingSenderId: "964441294320",
             appId: "1:964441294320:web:4c8da74a0cee8ed2644935",
             measurementId: "G-RYBWW6XB10"
@@ -1081,190 +1124,6 @@
         let currentAdminSubject = 'math';
         let allQuestions = [];
         let maxQuestions = 30;
-
-        // Real PDF Question Detection
-        class RealPDFQuestionDetector {
-            constructor() {
-                this.questions = [];
-            }
-
-            // Extract text from PDF using PDF.js
-            async extractTextFromPDF(file) {
-                return new Promise((resolve, reject) => {
-                    const fileReader = new FileReader();
-                    
-                    fileReader.onload = async function() {
-                        try {
-                            const typedarray = new Uint8Array(this.result);
-                            const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                            let fullText = '';
-                            
-                            // Extract text from all pages
-                            for (let i = 1; i <= pdf.numPages; i++) {
-                                const page = await pdf.getPage(i);
-                                const textContent = await page.getTextContent();
-                                const pageText = textContent.items.map(item => item.str).join(' ');
-                                fullText += pageText + '\n';
-                            }
-                            
-                            resolve(fullText);
-                        } catch (error) {
-                            reject(new Error('Failed to extract text from PDF: ' + error.message));
-                        }
-                    };
-                    
-                    fileReader.onerror = function() {
-                        reject(new Error('Failed to read PDF file'));
-                    };
-                    
-                    fileReader.readAsArrayBuffer(file);
-                });
-            }
-
-            // FIXED: Enhanced detection that properly finds all questions
-            enhancedDetectQuestions(text) {
-                this.questions = [];
-                
-                // Split text into lines for processing
-                const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                
-                let currentQuestion = null;
-                let currentOptions = [];
-                let questionNumber = 1;
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    
-                    // Check if this line starts a new question (multiple patterns)
-                    const questionPatterns = [
-                        /^(\d+)[\.\)]\s+(.+)$/i,                    // 1. Question or 1) Question
-                        /^Q(\d+):\s+(.+)$/i,                        // Q1: Question
-                        /^Question\s+(\d+):\s+(.+)$/i,              // Question 1: Question
-                        /^(\d+\.\d+)\s+(.+)$/i,                     // 1.1 Question
-                    ];
-                    
-                    let isQuestion = false;
-                    for (const pattern of questionPatterns) {
-                        const match = line.match(pattern);
-                        if (match && match[2].length > 5) { // Ensure reasonable question length
-                            isQuestion = true;
-                            
-                            // Save previous question if it exists and has options
-                            if (currentQuestion && currentOptions.length >= 2) {
-                                this.questions.push({
-                                    question: currentQuestion,
-                                    options: [...currentOptions],
-                                    number: questionNumber,
-                                    source: 'pdf'
-                                });
-                                questionNumber++;
-                            }
-                            
-                            currentQuestion = match[2].trim();
-                            currentOptions = [];
-                            break;
-                        }
-                    }
-                    
-                    // If not a question line, check for options
-                    if (!isQuestion && currentQuestion) {
-                        // Look for individual options
-                        const optionPatterns = [
-                            /^([A-D])[\.\)]\s+(.+)$/i,              // A. Option or A) Option
-                            /^Option\s+([A-D]):\s+(.+)$/i,          // Option A: Option
-                            /^\(([A-D])\)\s+(.+)$/i,                // (A) Option
-                        ];
-                        
-                        // Check current line for options
-                        for (const pattern of optionPatterns) {
-                            const match = line.match(pattern);
-                            if (match) {
-                                const optionText = match[2] || match[3];
-                                if (optionText && optionText.trim().length > 0) {
-                                    currentOptions.push(optionText.trim());
-                                }
-                            }
-                        }
-                        
-                        // Also check for multiple options in one line
-                        const multiOptionsMatch = line.match(/([A-D])[\.\)]\s+([^A-D]+)(?=[A-D][\.\)]|$)/gi);
-                        if (multiOptionsMatch) {
-                            multiOptionsMatch.forEach(option => {
-                                const cleanOption = option.replace(/^[A-D][\.\)]\s+/, '').trim();
-                                if (cleanOption) {
-                                    currentOptions.push(cleanOption);
-                                }
-                            });
-                        }
-                        
-                        // Check if line contains A) B) C) D) patterns
-                        const abcdOptions = line.match(/([A-D])\)\s*([^A-D)]+)/gi);
-                        if (abcdOptions) {
-                            abcdOptions.forEach(option => {
-                                const cleanOption = option.replace(/^[A-D]\)\s*/, '').trim();
-                                if (cleanOption) {
-                                    currentOptions.push(cleanOption);
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                // Don't forget the last question
-                if (currentQuestion && currentOptions.length >= 2) {
-                    this.questions.push({
-                        question: currentQuestion,
-                        options: [...currentOptions],
-                        number: questionNumber,
-                        source: 'pdf'
-                    });
-                }
-                
-                return this.questions;
-            }
-
-            // FIXED: Simple but effective detection for common formats
-            simpleDetectQuestions(text) {
-                this.questions = [];
-                
-                // Split by question numbers
-                const questionBlocks = text.split(/(?=\d+[\.\)]\s)/);
-                
-                questionBlocks.forEach((block, index) => {
-                    if (index === 0 && !block.match(/^\d+[\.\)]\s/)) return; // Skip first block if not a question
-                    
-                    // Extract question number and text
-                    const questionMatch = block.match(/^(\d+)[\.\)]\s+(.+?)(?=\s+[A-D][\.\)]|$)/s);
-                    if (!questionMatch) return;
-                    
-                    const questionText = questionMatch[2].trim();
-                    
-                    // Extract options
-                    const options = [];
-                    const optionRegex = /([A-D])[\.\)]\s*([^\nA-D]*)/g;
-                    let optionMatch;
-                    
-                    while ((optionMatch = optionRegex.exec(block)) !== null) {
-                        const optionText = optionMatch[2].trim();
-                        if (optionText && optionText.length > 0) {
-                            options.push(optionText);
-                        }
-                    }
-                    
-                    // If we have a question and at least 2 options, add it
-                    if (questionText && options.length >= 2) {
-                        this.questions.push({
-                            question: questionText,
-                            options: options,
-                            number: parseInt(questionMatch[1]) || (index),
-                            source: 'pdf'
-                        });
-                    }
-                });
-                
-                return this.questions;
-            }
-        }
 
         // DOM Elements
         const toast = document.getElementById('toast');
@@ -1284,6 +1143,7 @@
         // Content Tabs
         const contentTabs = document.querySelectorAll('.content-tab');
         const postNotesSection = document.getElementById('postNotesSection');
+        const studentQuestionsSection = document.getElementById('studentQuestionsSection');
         const postQuizzesSection = document.getElementById('postQuizzesSection');
         const manageContentSection = document.getElementById('manageContentSection');
         
@@ -1292,6 +1152,10 @@
         const noteFileInput = document.getElementById('noteFileInput');
         const noteFilePreview = document.getElementById('noteFilePreview');
         const postNoteBtn = document.getElementById('postNoteBtn');
+        
+        // Student Questions
+        const filterSubject = document.getElementById('filterSubject');
+        const studentQuestionsList = document.getElementById('studentQuestionsList');
         
         // Quizzes Section
         const quizUploadArea = document.getElementById('quizUploadArea');
@@ -1321,7 +1185,7 @@
             setupEventListeners();
             updateStats();
             updateUI();
-            loadContent();
+            loadStudentQuestions();
         }
 
         function setupEventListeners() {
@@ -1332,7 +1196,7 @@
                     this.classList.add('active');
                     currentAdminGrade = this.getAttribute('data-grade');
                     updateUI();
-                    loadContent();
+                    loadStudentQuestions();
                 });
             });
             
@@ -1343,7 +1207,7 @@
                     this.classList.add('active');
                     currentAdminSubject = this.getAttribute('data-subject');
                     updateUI();
-                    loadContent();
+                    loadStudentQuestions();
                 });
             });
             
@@ -1360,6 +1224,10 @@
             noteFileInput.addEventListener('change', handleNoteFileUpload);
             postNoteBtn.addEventListener('click', postNoteToFirebase);
             
+            // Student questions filter
+            filterSubject.addEventListener('change', loadStudentQuestions);
+            
+            // Quiz functionality
             quizUploadArea.addEventListener('click', () => quizFileInput.click());
             quizFileInput.addEventListener('change', handleQuizFileUpload);
             postQuizBtn.addEventListener('click', postQuizToFirebase);
@@ -1396,13 +1264,16 @@
         function switchContentTab(tabName) {
             contentTabs.forEach(tab => tab.classList.remove('active'));
             postNotesSection.classList.remove('active');
+            studentQuestionsSection.classList.remove('active');
             postQuizzesSection.classList.remove('active');
             manageContentSection.classList.remove('active');
             
             document.querySelector(`.content-tab[data-tab="${tabName}"]`).classList.add('active');
             document.getElementById(`${tabName}Section`).classList.add('active');
             
-            if (tabName === 'manageContent') {
+            if (tabName === 'studentQuestions') {
+                loadStudentQuestions();
+            } else if (tabName === 'manageContent') {
                 loadContent();
             }
         }
@@ -1442,8 +1313,8 @@
             const title = document.getElementById('noteTitleInput').value;
             const content = document.getElementById('noteContentInput').value;
             
-            if (!title || !content) {
-                showToast('Please enter both title and content for the note.', 'warning');
+            if (!title) {
+                showToast('Please enter a title for the note.', 'warning');
                 return;
             }
             
@@ -1484,61 +1355,129 @@
             }
         }
 
-        async function postQuizToFirebase() {
-            const title = document.getElementById('quizTitleInput').value;
-            
-            if (!title) {
-                showToast('Please enter a quiz title.', 'warning');
-                return;
-            }
-            
-            if (allQuestions.length === 0) {
-                showToast('Please add at least one question to the quiz.', 'warning');
-                return;
-            }
-            
-            // Validate all questions have correct answers
-            const incompleteQuestions = allQuestions.filter((q, index) => q.correctAnswer === undefined);
-            if (incompleteQuestions.length > 0) {
-                showToast(`Please select correct answers for all questions.`, 'warning');
-                return;
-            }
-            
-            const quizData = {
-                title: title,
-                questions: allQuestions,
-                subject: currentAdminSubject,
-                grade: currentAdminGrade,
-                createdAt: new Date().toISOString(),
-                type: 'quiz',
-                totalQuestions: allQuestions.length
-            };
+        async function loadStudentQuestions() {
+            const filterValue = filterSubject.value;
+            studentQuestionsList.innerHTML = '<div class="loading"></div> Loading student questions...';
             
             try {
-                postQuizBtn.innerHTML = '<div class="loading"></div> Posting...';
-                postQuizBtn.disabled = true;
+                const snapshot = await database.ref('student_messages').once('value');
+                const questionsData = snapshot.val();
                 
-                // Push to Firebase
-                const newQuizRef = database.ref('content/quizzes').push();
-                await newQuizRef.set(quizData);
+                studentQuestionsList.innerHTML = '';
                 
-                showToast(`Quiz "${title}" posted successfully to Firebase with ${allQuestions.length} questions!`);
+                if (!questionsData) {
+                    studentQuestionsList.innerHTML = '<p>No student questions found.</p>';
+                    return;
+                }
                 
-                // Clear the form
-                document.getElementById('quizTitleInput').value = '';
-                quizFilePreview.classList.remove('active');
-                quizFileInput.value = '';
-                clearAllQuestions();
+                let hasQuestions = false;
                 
-                updateStats();
-                loadContent();
+                Object.keys(questionsData).forEach(key => {
+                    const question = questionsData[key];
+                    
+                    // Apply filters
+                    if (filterValue && question.subject !== filterValue) {
+                        return;
+                    }
+                    
+                    if (question.grade === currentAdminGrade) {
+                        hasQuestions = true;
+                        const questionElement = createStudentQuestionElement(question, key);
+                        studentQuestionsList.appendChild(questionElement);
+                    }
+                });
+                
+                if (!hasQuestions) {
+                    studentQuestionsList.innerHTML = '<p>No student questions found for current filters.</p>';
+                }
                 
             } catch (error) {
-                console.error('Error posting quiz:', error);
-                showToast('Error posting quiz to Firebase: ' + error.message, 'error');
-            } finally {
-                postQuizBtn.innerHTML = 'Post Quiz to Firebase';
-                postQuizBtn.disabled = false;
+                console.error('Error loading student questions:', error);
+                studentQuestionsList.innerHTML = '<p>Error loading student questions.</p>';
+            }
+        }
+
+        function createStudentQuestionElement(question, questionId) {
+            const element = document.createElement('div');
+            element.className = 'student-question';
+            
+            const date = new Date(question.timestamp);
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            
+            element.innerHTML = `
+                <div class="question-meta">
+                    <span><strong>Subject:</strong> ${getSubjectName(question.subject)}</span>
+                    <span><strong>Grade:</strong> ${question.grade}</span>
+                    <span><strong>Date:</strong> ${formattedDate}</span>
+                </div>
+                <div class="question-content">
+                    <p>${question.content}</p>
+                </div>
+                ${question.response ? `
+                    <div class="question-response">
+                        <strong>Your Response:</strong> ${question.response.content}
+                        <div style="font-size: 0.8rem; margin-top: 8px; color: var(--dark-text-secondary);">
+                            Responded on: ${new Date(question.response.timestamp).toLocaleDateString()}
+                        </div>
+                    </div>
+                ` : ''}
+                <div class="question-actions">
+                    <button class="btn btn-success btn-sm respond-question" data-id="${questionId}">
+                        ${question.response ? 'Edit Response' : 'Respond'}
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-question" data-id="${questionId}">
+                        Delete
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners
+            element.querySelector('.respond-question').addEventListener('click', function() {
+                const questionId = this.getAttribute('data-id');
+                respondToQuestion(questionId);
+            });
+            
+            element.querySelector('.delete-question').addEventListener('click', function() {
+                const questionId = this.getAttribute('data-id');
+                deleteQuestion(questionId);
+            });
+            
+            return element;
+        }
+
+        async function respondToQuestion(questionId) {
+            const response = prompt('Enter your response to the student:');
+            if (!response) return;
+            
+            try {
+                await database.ref(`student_messages/${questionId}/response`).set({
+                    content: response,
+                    timestamp: new Date().toISOString(),
+                    respondedBy: 'Admin'
+                });
+                
+                showToast('Response sent to student');
+                loadStudentQuestions();
+                
+            } catch (error) {
+                console.error('Error responding to question:', error);
+                showToast('Error responding to question: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteQuestion(questionId) {
+            if (!confirm('Are you sure you want to delete this question?')) {
+                return;
+            }
+            
+            try {
+                await database.ref(`student_messages/${questionId}`).remove();
+                showToast('Question deleted successfully');
+                loadStudentQuestions();
+                
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showToast('Error deleting question: ' + error.message, 'error');
             }
         }
 
@@ -1637,7 +1576,7 @@
                         <div class="content-details">
                             ${isQuiz ? 
                                 `<p><strong>Questions:</strong> ${item.totalQuestions || item.questions?.length || 0}</p>` :
-                                `<p>${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}</p>`
+                                `<p>${item.content ? (item.content.substring(0, 100) + (item.content.length > 100 ? '...' : '')) : 'No content'}</p>`
                             }
                         </div>
                         <div class="content-actions">
@@ -1685,16 +1624,85 @@
         }
 
         // Notes Management
-        function handleNoteFileUpload(event) {
+        async function handleNoteFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                showToast('Please upload a PDF file.', 'error');
+                return;
+            }
             
             noteFilePreview.innerHTML = `
                 <p><strong>File:</strong> ${file.name}</p>
                 <p><strong>Type:</strong> ${file.type}</p>
                 <p><strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+                <div class="pdf-preview">
+                    <div class="extracted-text" id="pdfTextPreview">
+                        <div class="loading"></div> Reading PDF content...
+                    </div>
+                </div>
             `;
             noteFilePreview.classList.add('active');
+            
+            postNoteBtn.innerHTML = '<div class="loading"></div> Reading PDF...';
+            postNoteBtn.disabled = true;
+            
+            try {
+                // Extract text from PDF
+                const pdfText = await extractTextFromPDF(file);
+                
+                // Display extracted text
+                document.getElementById('pdfTextPreview').textContent = pdfText.substring(0, 2000) + 
+                    (pdfText.length > 2000 ? '... [truncated]' : '');
+                
+                // Auto-populate note content with extracted text
+                document.getElementById('noteContentInput').value = pdfText;
+                
+                showToast('PDF content extracted successfully. You can now post it as a note.');
+                
+            } catch (error) {
+                console.error('Error processing PDF:', error);
+                showToast('Error processing PDF: ' + error.message, 'error');
+                noteFilePreview.innerHTML += `<p style="color: var(--danger); margin-top: 16px;">Error: ${error.message}</p>`;
+            } finally {
+                // Reset button state
+                postNoteBtn.innerHTML = 'Post Note to Firebase';
+                postNoteBtn.disabled = false;
+            }
+        }
+
+        // Extract text from PDF using PDF.js
+        function extractTextFromPDF(file) {
+            return new Promise((resolve, reject) => {
+                const fileReader = new FileReader();
+                
+                fileReader.onload = async function() {
+                    try {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = '';
+                        
+                        // Extract text from all pages
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n';
+                        }
+                        
+                        resolve(fullText);
+                    } catch (error) {
+                        reject(new Error('Failed to extract text from PDF: ' + error.message));
+                    }
+                };
+                
+                fileReader.onerror = function() {
+                    reject(new Error('Failed to read PDF file'));
+                };
+                
+                fileReader.readAsArrayBuffer(file);
+            });
         }
 
         // Quiz Management
@@ -1894,6 +1902,190 @@
             questionReviewSection.classList.add('hidden');
             updateQuestionCount();
             showToast('All questions cleared');
+        }
+
+        // Real PDF Question Detection
+        class RealPDFQuestionDetector {
+            constructor() {
+                this.questions = [];
+            }
+
+            // Extract text from PDF using PDF.js
+            async extractTextFromPDF(file) {
+                return new Promise((resolve, reject) => {
+                    const fileReader = new FileReader();
+                    
+                    fileReader.onload = async function() {
+                        try {
+                            const typedarray = new Uint8Array(this.result);
+                            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                            let fullText = '';
+                            
+                            // Extract text from all pages
+                            for (let i = 1; i <= pdf.numPages; i++) {
+                                const page = await pdf.getPage(i);
+                                const textContent = await page.getTextContent();
+                                const pageText = textContent.items.map(item => item.str).join(' ');
+                                fullText += pageText + '\n';
+                            }
+                            
+                            resolve(fullText);
+                        } catch (error) {
+                            reject(new Error('Failed to extract text from PDF: ' + error.message));
+                        }
+                    };
+                    
+                    fileReader.onerror = function() {
+                        reject(new Error('Failed to read PDF file'));
+                    };
+                    
+                    fileReader.readAsArrayBuffer(file);
+                });
+            }
+
+            // FIXED: Enhanced detection that properly finds all questions
+            enhancedDetectQuestions(text) {
+                this.questions = [];
+                
+                // Split text into lines for processing
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                
+                let currentQuestion = null;
+                let currentOptions = [];
+                let questionNumber = 1;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    
+                    // Check if this line starts a new question (multiple patterns)
+                    const questionPatterns = [
+                        /^(\d+)[\.\)]\s+(.+)$/i,                    // 1. Question or 1) Question
+                        /^Q(\d+):\s+(.+)$/i,                        // Q1: Question
+                        /^Question\s+(\d+):\s+(.+)$/i,              // Question 1: Question
+                        /^(\d+\.\d+)\s+(.+)$/i,                     // 1.1 Question
+                    ];
+                    
+                    let isQuestion = false;
+                    for (const pattern of questionPatterns) {
+                        const match = line.match(pattern);
+                        if (match && match[2].length > 5) { // Ensure reasonable question length
+                            isQuestion = true;
+                            
+                            // Save previous question if it exists and has options
+                            if (currentQuestion && currentOptions.length >= 2) {
+                                this.questions.push({
+                                    question: currentQuestion,
+                                    options: [...currentOptions],
+                                    number: questionNumber,
+                                    source: 'pdf'
+                                });
+                                questionNumber++;
+                            }
+                            
+                            currentQuestion = match[2].trim();
+                            currentOptions = [];
+                            break;
+                        }
+                    }
+                    
+                    // If not a question line, check for options
+                    if (!isQuestion && currentQuestion) {
+                        // Look for individual options
+                        const optionPatterns = [
+                            /^([A-D])[\.\)]\s+(.+)$/i,              // A. Option or A) Option
+                            /^Option\s+([A-D]):\s+(.+)$/i,          // Option A: Option
+                            /^\(([A-D])\)\s+(.+)$/i,                // (A) Option
+                        ];
+                        
+                        // Check current line for options
+                        for (const pattern of optionPatterns) {
+                            const match = line.match(pattern);
+                            if (match) {
+                                const optionText = match[2] || match[3];
+                                if (optionText && optionText.trim().length > 0) {
+                                    currentOptions.push(optionText.trim());
+                                }
+                            }
+                        }
+                        
+                        // Also check for multiple options in one line
+                        const multiOptionsMatch = line.match(/([A-D])[\.\)]\s+([^A-D]+)(?=[A-D][\.\)]|$)/gi);
+                        if (multiOptionsMatch) {
+                            multiOptionsMatch.forEach(option => {
+                                const cleanOption = option.replace(/^[A-D][\.\)]\s+/, '').trim();
+                                if (cleanOption) {
+                                    currentOptions.push(cleanOption);
+                                }
+                            });
+                        }
+                        
+                        // Check if line contains A) B) C) D) patterns
+                        const abcdOptions = line.match(/([A-D])\)\s*([^A-D)]+)/gi);
+                        if (abcdOptions) {
+                            abcdOptions.forEach(option => {
+                                const cleanOption = option.replace(/^[A-D]\)\s*/, '').trim();
+                                if (cleanOption) {
+                                    currentOptions.push(cleanOption);
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Don't forget the last question
+                if (currentQuestion && currentOptions.length >= 2) {
+                    this.questions.push({
+                        question: currentQuestion,
+                        options: [...currentOptions],
+                        number: questionNumber,
+                        source: 'pdf'
+                    });
+                }
+                
+                return this.questions;
+            }
+
+            // FIXED: Simple but effective detection for common formats
+            simpleDetectQuestions(text) {
+                this.questions = [];
+                
+                // Split by question numbers
+                const questionBlocks = text.split(/(?=\d+[\.\)]\s)/);
+                
+                questionBlocks.forEach((block, index) => {
+                    if (index === 0 && !block.match(/^\d+[\.\)]\s/)) return; // Skip first block if not a question
+                    
+                    // Extract question number and text
+                    const questionMatch = block.match(/^(\d+)[\.\)]\s+(.+?)(?=\s+[A-D][\.\)]|$)/s);
+                    if (!questionMatch) return;
+                    
+                    const questionText = questionMatch[2].trim();
+                    
+                    // Extract options
+                    const options = [];
+                    const optionRegex = /([A-D])[\.\)]\s*([^\nA-D]*)/g;
+                    let optionMatch;
+                    
+                    while ((optionMatch = optionRegex.exec(block)) !== null) {
+                        const optionText = optionMatch[2].trim();
+                        if (optionText && optionText.length > 0) {
+                            options.push(optionText);
+                        }
+                    }
+                    
+                    // If we have a question and at least 2 options, add it
+                    if (questionText && options.length >= 2) {
+                        this.questions.push({
+                            question: questionText,
+                            options: options,
+                            number: parseInt(questionMatch[1]) || (index),
+                            source: 'pdf'
+                        });
+                    }
+                });
+                
+                return this.questions;
+            }
         }
     </script>
 </body>
